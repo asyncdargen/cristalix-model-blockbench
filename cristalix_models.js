@@ -40,6 +40,7 @@ function exportToCristalixModel(zip) {
             title: "Ошибка",
             message: "Нет текстуры в проекте"
         });
+        throw new Error("No any textures in project")
         return;
     }
 
@@ -95,6 +96,7 @@ async function importFromCristalixModel(zip, overwrite) {
             title: "Ошибка",
             message: `Текстура повреждена`
         });
+        return;
     }
 
     try {
@@ -106,10 +108,20 @@ async function importFromCristalixModel(zip, overwrite) {
             title: "Ошибка",
             message: `Модель повреждена`
         });
+        return;
     }
 
     if (animationData) {
-        Animator.importFile({content: animationData}, false)
+        try {
+            Animator.importFile({content: animationData}, false)
+        } catch (e) {
+            console.log(e);
+            Blockbench.showMessageBox({
+                title: "Ошибка",
+                message: `Анимации повреждены`
+            });
+            return;
+        }
     }
 
     Formats.cristalix_model.select();
@@ -211,7 +223,7 @@ const actions = {
     "file.export": [
         new Action("export_cristalix_model", {
             name: "Export Cristalix Model",
-            icon: "fa-archive",
+            icon: "fa-gem",
             category: "file",
             click: exportModel
         })
@@ -219,7 +231,7 @@ const actions = {
     "file.import": [
         new Action("import_cristalix_model", {
             name: "Import Cristalix Model",
-            icon: "fa-archive",
+            icon: "fa-gem",
             category: "file",
             click: async function () {
                 Blockbench.import({
@@ -234,7 +246,7 @@ const actions = {
         }),
         new Action("import_overwrite_cristalix_model", {
             name: "Import Cristalix Model (Overwrite)",
-            icon: "fa-archive",
+            icon: "fa-gem",
             category: "file",
             click: async function () {
                 Blockbench.import({
@@ -250,7 +262,7 @@ const actions = {
     ]
 }
 
-Plugin.register("cristalix_models", {
+Plugin.register("cristalix-models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
@@ -263,7 +275,7 @@ Plugin.register("cristalix_models", {
             id: 'cristalix_model',
             name: 'Cristalix Model',
             description: 'A Cristalix model format',
-            icon: 'fa-cube',
+            icon: 'fa-gem',
             category: 'general',
             target: ['Cristalix Model'],
             show_on_start_screen: true,
