@@ -226,6 +226,7 @@ const cristalix_model_codec = new Codec('cristalix-model', {
     afterSave(path) {
         Project.saved = true;
         Texture.all.forEach(tex => tex.saved = true);
+
         Project.export_path = path;
         Blockbench.showQuickMessage("Saved as " + pathToName(path, true))
         addRecentProject({
@@ -286,7 +287,7 @@ Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
-    version: "1.0.2",
+    version: "1.0.3",
     variant: "both",
     icon: 'icon.png',
 
@@ -320,6 +321,17 @@ Plugin.register("cristalix_models", {
 
         Codecs['cristalix_model'] = cristalix_model_codec;
         Formats.cristalix_model.codec = cristalix_model_codec;
+
+        Blockbench.on('edit_animation_properties', data => {
+            data.saved = Project.format === cristalix_model_codec;
+        });
+        Blockbench.on('add_texture', data => {
+            data.saved = Project.format === cristalix_model_codec;
+        });
+        Blockbench.on('change_texture_path', data => {
+            data.saved = Project.format === cristalix_model_codec;
+        });
+
 
         for (const [category, actionsList] of Object.entries(actions)) {
             actionsList.forEach(action => {
