@@ -286,7 +286,7 @@ Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
-    version: "1.0.0",
+    version: "1.0.2",
     variant: "both",
     icon: 'icon.png',
 
