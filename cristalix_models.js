@@ -165,7 +165,7 @@ async function exportModel() {
     });
 }
 
-const cristalix_model_codec = new Codec('cristalix_model', {
+const cristalix_model_codec = new Codec('cristalix-model', {
     name: 'Cristalix Model',
     extension: 'model',
     load_filter: {
@@ -210,7 +210,7 @@ const cristalix_model_codec = new Codec('cristalix_model', {
         zip.generateAsync({type: "blob"}).then(async (content) => {
             const arrayBuffer = await content.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
-
+            
             Blockbench.writeFile(path, {
                 content: buffer,
                 savetype: 'buffer'
@@ -226,7 +226,7 @@ const cristalix_model_codec = new Codec('cristalix_model', {
     afterSave(path) {
         Project.saved = true;
         Texture.all.forEach(tex => tex.saved = true);
-        Project.save_path = path;
+        Project.export_path = path;
     },
     async export() {
         exportModel();
