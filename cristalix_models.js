@@ -286,7 +286,7 @@ Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
-    version: "1.0.1",
+    version: "1.0.0",
     variant: "both",
     icon: 'icon.png',
 
@@ -304,6 +304,8 @@ Plugin.register("cristalix_models", {
             },
             extension: 'model',
             animation_mode: true,
+            animation_controllers: true,
+            animation_files: true,
             single_texture: false,
             bone_rig: true,
             rotate_cubes: true,
