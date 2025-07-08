@@ -210,7 +210,7 @@ const cristalix_model_codec = new Codec('cristalix-model', {
         zip.generateAsync({type: "blob"}).then(async (content) => {
             const arrayBuffer = await content.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
-            
+
             Blockbench.writeFile(path, {
                 content: buffer,
                 savetype: 'buffer'
@@ -227,6 +227,12 @@ const cristalix_model_codec = new Codec('cristalix-model', {
         Project.saved = true;
         Texture.all.forEach(tex => tex.saved = true);
         Project.export_path = path;
+        Blockbench.showQuickMessage("Saved as " + pathToName(path, true))
+        addRecentProject({
+            name: Project.name,
+            path: path,
+            icon: Format.cristalix_model
+        });
     },
     async export() {
         exportModel();
