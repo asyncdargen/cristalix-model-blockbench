@@ -250,12 +250,13 @@ const actions = {
     ]
 }
 
-Plugin.register("cristalix-models", {
+Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
     version: "1.0.0",
     variant: "both",
+    icon: 'icon.png',
 
     onload() {
         const format = new ModelFormat('cristalix_model', {
