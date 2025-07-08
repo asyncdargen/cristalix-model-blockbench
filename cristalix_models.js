@@ -52,6 +52,15 @@ function exportToCristalixModel(zip) {
 
     if (Animation.all.length != 0) {
         const animations = Animator.buildFile(null, null);
+        Object.keys(animations.animations).forEach(key => {
+            if (key.includes("_")) {
+                Blockbench.showMessageBox({
+                    title: "Ошибка",
+                    message: "В названии анимации используется недоступный символ '\\_': " + key.replace('_', '\\_')
+                });
+                throw new Error("Invalid animation name: " + key)
+            }
+        })
         zip.file("model.animation", JSON.stringify(animations, null, 4));
     }
 }
@@ -147,7 +156,7 @@ async function exportModel() {
             extensions: ['model', 'zip'],
             name: Project.name + ".model",
             content: buffer
-        });
+        }, path => cristalix_model_codec.afterSave(path));
     }).catch(err => {
         Blockbench.showMessageBox({
             title: "Ошибка",
@@ -205,7 +214,7 @@ const cristalix_model_codec = new Codec('cristalix_model', {
             Blockbench.writeFile(path, {
                 content: buffer,
                 savetype: 'buffer'
-            }, rs => Project.saved = true);
+            }, rs => cristalix_model_codec.afterSave(path));
         }).catch(err => {
             console.log(err);
             Blockbench.showMessageBox({
@@ -213,6 +222,11 @@ const cristalix_model_codec = new Codec('cristalix_model', {
                 message: `Не удалось сохранить модель: ${err.message}`
             });
         });
+    },
+    afterSave(path) {
+        Project.saved = true;
+        Texture.all.forEach(tex => tex.saved = true);
+        Project.save_path = path;
     },
     async export() {
         exportModel();
@@ -262,7 +276,7 @@ const actions = {
     ]
 }
 
-Plugin.register("cristalix-models", {
+Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
@@ -283,6 +297,7 @@ Plugin.register("cristalix-models", {
                 content: ''
             },
             extension: 'model',
+            animation_mode: true,
             single_texture: false,
             bone_rig: true,
             rotate_cubes: true,
