@@ -31,7 +31,7 @@ function cleanUp(elements) {
 }
 
 function exportToCristalixModel(zip) {
-    const texture = Texture.all[0];
+    const texture = Texture.selected ? Texture.selected : Texture.all[0];
     if (texture) {
         const textureBlob = base64ToBlob(texture.getBase64());
         zip.file(`model.png`, textureBlob);
@@ -287,7 +287,7 @@ Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
-    version: "1.0.3",
+    version: "1.0.0",
     variant: "both",
     icon: 'icon.png',
 
