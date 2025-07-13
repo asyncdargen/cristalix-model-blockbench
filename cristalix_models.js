@@ -206,6 +206,61 @@ async function exportModel() {
     });
 }
 
+function rename_model(model, name) {
+    model.old_name = model.name;
+    model.name = name;
+    model.saveName(true);
+}
+
+function detect_bones() {
+    var result = [];
+
+    if (!Group.all.findLast(g => g.name == "Body" && g.parent == "root")) {
+        var incorrectBodyElement = Group.all.findLast(g => g.parent == "root" && g.name.includes("body"));
+        var rootGroup = Group.all.findLast(g => g.parent == "root" && g.name == "root");
+        var onlyRootGroup = Group.all.filter(g => g.parent == "root").length == 1 && (Group.all.filter(g => g.parent == "root")[0].name == "root" || Group.all.filter(g => g.parent == "root")[0].parent == "root");
+
+        var rootGroups = Group.all.filter(g => g.parent == "root");
+        var rootCubes = Cube.all.filter(g => g.parent == "root");
+
+        if (incorrectBodyElement) {
+            rename_model(incorrectBodyElement, "Body");
+            result.push("body переименован в Body");
+        } else if (onlyRootGroup) {
+            var root = Group.all.findLast(g => g.parent == "root");
+            result.push(`${root.name} переименован в Body`);
+            rename_model(root, "Body");
+        } else if (rootGroup) { //for bedrock vanilla entities
+            rename_model(rootGroup, "Body");
+            result.push(`root переименован в Body`);
+        } else {
+            const newBody = new Group({name: "Body"});
+            newBody.init();
+            rootGroups.forEach(g => g.addTo(newBody));
+            rootCubes.forEach(c => c.addTo(newBody));
+            result.push("Все кости и группы перемещены в новую группу Body")
+        }
+    }
+
+    if (!Group.all.findLast(g => g.name == "Head")) {
+        var incorrectHeadGroup = Group.all.findLast(g => g.name == "head");
+
+        if (incorrectHeadGroup) {
+            result.push(`${incorrectHeadGroup.name} переименована в Head`);
+            rename_model(incorrectHeadGroup, "Head");
+        } else {
+            result.push("Группа для головы не найдена!")
+        }
+    }
+
+    if (result.length != 0) {
+        Blockbench.showMessageBox({
+            title: "Детект модели",
+            message: `${result.join("<br>")}`
+        });
+    }
+}
+
 const cristalix_model_codec = new Codec('cristalix-model', {
     name: 'Cristalix Model',
     extension: 'model',
@@ -390,7 +445,15 @@ const actions = {
 
                 Animation.all.forEach(anim => anim.name = anim.name.replaceAll('_', ''));
             }
-        })
+        }),
+        new Action("detect_cristalix_model", {
+            name: "Detect Cristalix model",
+            icon: "fa-anchor",
+            category: "edit",
+            click: async function () {
+                detect_bones();
+            }
+        }),
     ]
 }
 
@@ -398,7 +461,7 @@ Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Поддержка формата Cristalix моделей и утилитарные фунеции",
-    version: "1.0.7",
+    version: "1.0.8",
     variant: "both",
     icon: 'icon.png',
 
