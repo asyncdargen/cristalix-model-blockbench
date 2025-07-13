@@ -30,8 +30,7 @@ function cleanUp(elements) {
     }
 }
 
-function exportToCristalixModel(zip) {
-    const texture = Texture.selected ? Texture.selected : Texture.all[0];
+function exportToCristalixModel(zip, texture = Texture.selected ? Texture.selected : Texture.all[0]) {
     if (texture) {
         const textureBlob = base64ToBlob(texture.getBase64());
         zip.file(`model.png`, textureBlob);
@@ -64,6 +63,48 @@ function exportToCristalixModel(zip) {
         zip.file("model.animation", JSON.stringify(animations, null, 4));
     }
 }
+
+
+async function exportBulkModel(manual, generator = (id, tex) => tex.name) {
+    if (manual) {
+        Texture.all.forEach(tex => {
+            tex.select();
+            cristalix_model_codec.export();
+        })
+    } else {
+        const folder = electron.dialog.showOpenDialogSync({
+            properties: ['openDirectory'],
+            defaultPath: StateMemory.dialog_paths["cristalix_model_export"]
+        })
+        if (!folder) {
+            return;
+        }
+
+        var idx = 0;
+        Texture.all.forEach(tex => {
+            const zip = new JSZip();
+
+            exportToCristalixModel(zip, tex);
+
+            zip.generateAsync({type: "blob"}).then(async (content) => {
+                const arrayBuffer = await content.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+
+                Blockbench.writeFile(folder[0] + '\\' + generator(idx++, tex) + ".model", {
+                    content: buffer,
+                    savetype: 'buffer'
+                }, rs => cristalix_model_codec.afterSave(rs));
+            }).catch(err => {
+                console.log(err);
+                Blockbench.showMessageBox({
+                    title: "Ошибка",
+                    message: `Не удалось сохранить модель: ${err.message}`
+                });
+            });
+        })
+    }
+}
+
 
 async function importFromCristalixModel(zip, overwrite) {
     let modelData, animationData, textureData;
@@ -247,6 +288,39 @@ const actions = {
             icon: "fa-gem",
             category: "file",
             click: exportModel
+        }),
+        new Action("export_bulk_cristalix_model", {
+            name: "Export Cristalix Model (Per Texture)",
+            icon: "fa-gem",
+            category: "file",
+            click: async function () {
+                exportBulkModel(false);
+            }
+        }),
+        new Action("export_bulk_generate_cristalix_model", {
+            name: "Export Cristalix Model (Per Texture - Name Generator)",
+            icon: "fa-gem",
+            category: "file",
+            click: async function () {
+                Blockbench.textPrompt("Генератор имен для моделей", "tex.name",
+                    generator => {
+                        exportBulkModel(false, function (id, tex) {
+                            const result = eval(generator);
+
+                            return result ? result : tex.name;
+                        })
+                    },
+                    {info: "tex - параметр текстуры, id - порядковый номер текстуры"}
+                )
+            }
+        }),
+        new Action("export_bulk_manual_cristalix_model", {
+            name: "Export Cristalix Model (Per Texture - Manual)",
+            icon: "fa-gem",
+            category: "file",
+            click: async function () {
+                exportBulkModel(true);
+            }
         })
     ],
     "file.import": [
@@ -287,7 +361,7 @@ Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Support export/import in Cristalix model format",
-    version: "1.0.5",
+    version: "1.0.6",
     variant: "both",
     icon: 'icon.png',
 
