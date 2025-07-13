@@ -55,7 +55,7 @@ function exportToCristalixModel(zip, texture = Texture.selected ? Texture.select
             if (key.includes("_")) {
                 Blockbench.showMessageBox({
                     title: "Ошибка",
-                    message: "В названии анимации используется недоступный символ '\\_': " + key.replace('_', '\\_')
+                    message: "В названии анимации используется недоступный символ (Edit -> Fix Cristalix animations) '\\_': " + key.replace('_', '\\_')
                 });
                 throw new Error("Invalid animation name: " + key)
             }
@@ -354,14 +354,51 @@ const actions = {
                 })
             }
         })
+    ],
+    "edit": [
+        new MenuSeparator('cristalix'),
+        new Action("fix_cristalix_animations", {
+            name: "Fix Cristalix animations",
+            icon: "fa-hammer",
+            category: "edit",
+            click: async function () {
+                Animation.all.forEach(anim => anim.name = anim.name.replaceAll('_', '.'));
+            }
+        }),
+        new Action("link_cristalix_animations", {
+            name: "Link Cristalix animations",
+            icon: "fa-link",
+            category: "edit",
+            click: async function () {
+                const keys = {
+                    'walk': ['walk', 'move', 'walking', 'moving', 'fly'],
+                    'idle': ['idle', 'stand', 'afk', 'standing'],
+                    'hurt': ['damage', 'hurt', 'damaging', 'hurting'],
+                    'death': ['death', 'die']
+                }
+
+                Animation.all.forEach(anim => {
+                    for (const [key, matches] of Object.entries(keys)) {
+                        for (const match of matches) {
+                            if (anim.name.includes(match)) {
+                                anim.name = key;
+                                return;
+                            }
+                        }
+                    }
+                });
+
+                Animation.all.forEach(anim => anim.name = anim.name.replaceAll('_', '.'));
+            }
+        })
     ]
 }
 
 Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
-    description: "Support export/import in Cristalix model format",
-    version: "1.0.6",
+    description: "Поддержка формата Cristalix моделей и утилитарные фунеции",
+    version: "1.0.7",
     variant: "both",
     icon: 'icon.png',
 
