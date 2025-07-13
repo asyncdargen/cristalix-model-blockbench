@@ -28,6 +28,7 @@
 ### Edit
 - **Fix Cristalix animations** — исправляет название анимаций (удаляет запрещенный символ `_`)
 - **Link Cristalix animations** — автоматически (по названием) определяет анимации встроенные в клиент и устанавливает им нужные названия (`walk`, `stand`, `hurt`, `death`)
+- **Detect Cristalix model `(experimental)`** - эксперементальная функция, в некоторых случаях верно обрабатывает и переименовывает группы модели под Body и Head
 
 ### Project
 - **Create Cristalix Model** — создание новой модели Cristalix
