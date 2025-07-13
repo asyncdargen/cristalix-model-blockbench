@@ -427,7 +427,7 @@ const actions = {
             click: async function () {
                 const keys = {
                     'walk': ['walk', 'move', 'walking', 'moving', 'fly'],
-                    'idle': ['idle', 'stand', 'afk', 'standing'],
+                    'idle': ['idle', 'stand', 'afk', 'rest'],
                     'hurt': ['damage', 'hurt', 'damaging', 'hurting'],
                     'death': ['death', 'die']
                 }
@@ -461,7 +461,7 @@ Plugin.register("cristalix_models", {
     title: "Cristalix Models",
     author: "dargen",
     description: "Поддержка формата Cristalix моделей и утилитарные фунеции",
-    version: "1.0.8",
+    version: "1.0.8.1",
     variant: "both",
     icon: 'icon.png',
 
