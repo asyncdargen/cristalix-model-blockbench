@@ -362,7 +362,7 @@ const actions = {
             icon: "fa-hammer",
             category: "edit",
             click: async function () {
-                Animation.all.forEach(anim => anim.name = anim.name.replaceAll('_', '.'));
+                Animation.all.forEach(anim => anim.name = anim.name.replaceAll('_', ''));
             }
         }),
         new Action("link_cristalix_animations", {
@@ -388,7 +388,7 @@ const actions = {
                     }
                 });
 
-                Animation.all.forEach(anim => anim.name = anim.name.replaceAll('_', '.'));
+                Animation.all.forEach(anim => anim.name = anim.name.replaceAll('_', ''));
             }
         })
     ]
